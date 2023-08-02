@@ -64,22 +64,8 @@ function walk() {
 
    let el;
 
-    // test code
-    // note: this comes out late
-    //el = document.getElementsByTagName('fieldset');
-    //let parent = el[0];
-    //let para = document.createElement('textarea');
-    //let text = document.createTextNode('test text');
-    //para.appendChild(text);
-    //parent.appendChild(para);
 
-    const treeWalk = document.createTreeWalker(document.getElementsByTagName('html')[0]);
-    let rootNode = treeWalk.root;
-
-    console.log(rootNode.nodeName);
-    rootNode = rootNode.childNodes[2].childNodes;
-    console.log(rootNode);
-
+    
     // given code
 
    el = document.getElementById('p1');
@@ -103,13 +89,63 @@ function walk() {
 
 }
 
+/**
+ * QUESTION 1B
+ */
 function advancedWalk(){
-    let textArea = document.getElementById('advWalkTxt');
-    textArea.value = "";
+    let rootNode = document.getElementsByTagName('html')[0];
+    let domTree = advanceWalkHelper(rootNode);
+    document.getElementById('advWalkTxt').value = domTree;
+
+}
+
+function advanceWalkHelper(root) {
+    let treeWalk = document.createTreeWalker(root);
+
+    let domTree = "";
+    let currNode = treeWalk.currentNode;
+    let parentCount = 0;
+
+    while(currNode){
+        let indent = "";
+        for(let i = 0; i < parentCount; i++){
+            indent += "|   ";
+        }
+
+        domTree += indent + "|---"+ currNode.nodeName + "\n";
+        if(currNode.firstChild){
+            parentCount += 1;
+            treeWalk.currentNode = currNode.firstChild;
+        } else if (currNode.nextSibling) {
+            treeWalk.currentNode = currNode.nextSibling;
+        } else {
+            let parentNode = currNode.parentNode;
+            while (parentNode && !parentNode.nextSibling){
+                parentCount -= 1;
+                parentNode = parent.parentNode;
+            }
+
+            if(!parentNode){
+                break;
+            }
+
+            parentCount -= 1;
+            treeWalk.currentNode = parentNode.nextSibling;
+        }
+
+        currNode = treeWalk.currentNode;
+    }
+
+    return domTree;
 }
 
 
 
+
+/**
+ * 
+ * QUESTION 1A
+ */
 function showNode(el) {
     let nodeType = el.nodeType;
     let nodeName = el.nodeName;
@@ -148,7 +184,7 @@ function modify() {
 }
 
 /**
- * For part 2: modifies h1"
+ * For QUESTION 2: modifies h1"
  */
 function advancedModify(){
     let h1Element = document.getElementsByTagName('h1')[0];
@@ -195,7 +231,7 @@ function add() {
 
 
 /**
- * QUESTION 3A
+ * QUESTION 3
  */
 function advancedAdd(){
     const defText = "this is some default text that I have to use";
@@ -278,7 +314,9 @@ function basicClone(){
 
 }
 
-
+/**
+ * QUESTION 5B
+ */
 function advancedClone(){
     let card = document.querySelector('#cardTemplate').content.cloneNode(true);
     console.log(card);
